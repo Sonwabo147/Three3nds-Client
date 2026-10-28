@@ -346,4 +346,40 @@ tbody tr:nth-child(odd) {
 
 
 
+.propertySharing {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.shareIcon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.shareIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.shareIcon:hover {
+    transform: scale(1.08);
+}
+
+.shareIcon:focus-visible {
+    outline: 2px solid #1877F2;
+    outline-offset: 3px;
+}
+
+
+
+
 

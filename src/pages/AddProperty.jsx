@@ -163,7 +163,7 @@ const AddProperty = () => {
             {user &&
             <>
                 <form onSubmit={addPropertyHandler} className='mainForm'>
-                    <h2>Add Property</h2>
+                    <h2>Add Commercial Property</h2>
                     <div
                         onClick={() => document.getElementById("fileInput").click()}
                         onDragOver={handleDragOver}

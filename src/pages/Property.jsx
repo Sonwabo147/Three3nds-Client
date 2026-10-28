@@ -5,6 +5,78 @@ import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+
+const PropertySharing = ({ property }) => {
+    // Use the current website URL and property ID
+    const listingUrl =
+        `${window.location.origin}/property/${property.id}`;
+
+    const shareMessage =
+        `${property.name}\n` +
+        `Location: ${property.location}\n` +
+        `Monthly rental: R${property.monthly_rental || "N/A"}\n` +
+        `View property: ${listingUrl}`;
+
+    const shareWhatsApp = () => {
+        const url =
+            `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    const shareFacebook = () => {
+        const url =
+            `https://www.facebook.com/sharer/sharer.php?u=${
+                encodeURIComponent(listingUrl)
+            }`;
+
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    const copyAdvert = async () => {
+        try {
+            await navigator.clipboard.writeText(shareMessage);
+            alert("Property advert copied!");
+        } catch (error) {
+            alert("Unable to copy. Please copy the property link manually.");
+        }
+    };
+
+    return (
+        <>
+            <h3 style={{textAlign: "center"}}>Share</h3>
+            <div className="propertySharing">
+                <br />
+                <button
+                    className="shareIcon"
+                    onClick={shareWhatsApp}
+                    aria-label="Share on WhatsApp"
+                    title="Share on WhatsApp"
+                >
+                    <img src="/whatsappIcon.png" alt="" />
+                </button>
+
+                <button className="shareIcon"
+                    onClick={shareFacebook}
+                    aria-label="Share on Facebook"
+                    title="Share on Facebook"
+                >
+                    <img src="/facebook.png" alt="" />
+                </button>
+
+                <button className="shareIcon"
+                    onClick={copyAdvert}
+                    aria-label="Copy Advert"
+                    title="Copy Advert"
+                >
+                    <img src="/copy.png" alt="" />
+                </button>
+            </div>
+        </>
+    );
+};
+
+
 const Property = () => {
     const [auth, setAuth] = useState (null);
     const { pid } = useParams();
@@ -12,6 +84,8 @@ const Property = () => {
     const [error, setError] = useState (null);
     const [isOpen, setIsOpen] = useState (true);
     const [showModal, setShowModal] = useState (false)
+    const [status, setStatus] = useState (null);
+    
     const navigate = useNavigate();
     useEffect (() => {
 
@@ -32,7 +106,18 @@ const Property = () => {
         }
         checkAuth ()
         getProperty ();
-     }, [pid])
+    }, [pid])
+
+    const updatePropertyHandler = async () =>{
+        if (property.availability !== status) {
+            const res = await api (`/property/updateStatus`, 'POST', {pid, status})
+            if (res.error) {
+                alert(res.error)
+            } else {
+                alert(res.success)
+            }
+        }
+    }
 
     const openConfirm = () => setShowModal (true)
     const handleCancel = () => setShowModal(false);
@@ -52,26 +137,30 @@ const Property = () => {
                             ))}
                         </div>
                         <h2>{property.name || ''}</h2>
-                        <div className="profileDatail">
+                        {/* <div className="profileDatail">
                             <span><b>Location</b>:</span>
                             <span>{property.location}</span>
-                        </div>
+                        </div> */}
 
                         <div className="profileDatail">
-                            <span><b>Suitable For</b>:</span>
-                            <span>{property.suitable_for}</span>
-                        </div>
-
-                        <div className="profileDatail">
-                            <span><b>Owner</b>:</span>
+                            <span><b>Agent</b>:</span>
                             <span>{property.user.name} {property.user.surname}</span>
                         </div>
 
-                        <div className="profileDatail">
-                            <span><b>Availability</b>:</span>
-                            <span>{property.availability}</span>
-                        </div>
-
+                        {auth && auth.uid === property.uid ?
+                            <select name="" id="" onChange={e => {setStatus(e.target.value)}}>
+                                <option value={property.availability}>{property.availability}</option>
+                                <option value="Available">Available</option>
+                                <option value="Reserved">Reserved</option>
+                                <option value="Rented">Rented</option>
+                                <option value="Unavailable">Unavailable</option>
+                            </select>
+                        :
+                            <div className="profileDatail">
+                                <span><b>Availability</b>:</span>
+                                <span>{property.availability}</span>
+                            </div>
+                        }
                         <div className="profileDatail">
                             <span><b>Condition</b>:</span>
                             <span>{property.property_condition}</span>
@@ -79,7 +168,7 @@ const Property = () => {
 
                         <div className="profileDatail">
                             <span><b>Monthly Rental</b>:</span>
-                            <span>{property.monthly_rental || "N/A"}</span>
+                            <span>{`R${property.monthly_rental}` || "N/A"}</span>
                         </div>
 
                         <div className="profileDatail">
@@ -102,6 +191,12 @@ const Property = () => {
                             <span>{property.water || "N/A"}</span>
                         </div>
                         
+                        {auth && auth.uid === property.uid ?
+                        <button onClick={updatePropertyHandler}>Update</button>
+                        :<Link to={`/enquire/${property.pid}`}>Enquire</Link>}
+                            
+                            
+                        <PropertySharing property={property} />
                     </div>
                 </>
             )}
