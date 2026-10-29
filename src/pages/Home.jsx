@@ -77,7 +77,7 @@ const Home = () => {
                   {properties.map((item, index) => (
                       <tr key={index}>
                           <td>
-                              <Link to={`/property/${item.pid}`} >{item.name || item.title || 'N/A'}</Link>
+                              <Link to={`/resproperty/${item.pid}`} >{item.name || item.title || 'N/A'}</Link>
                           </td>
                           <td>{`R${item.monthly_rental}` || 'N/A'}</td>
                           <td>{item.availability}</td>
