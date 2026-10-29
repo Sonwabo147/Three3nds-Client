@@ -34,6 +34,7 @@ const AddProperty = () => {
             deposit: '', size: '', availability: '',
             condition: '', floorPlan: [], parking: [],
             power: [], water: [],  
+            landlordName: '', landlordPhone: ''
     });
 
     const parkingOptions = [
@@ -308,6 +309,24 @@ const AddProperty = () => {
                                 </label>
                             ))}
                         </div>
+                    </div>
+                    <div className="inpDiv">
+                        <input 
+                            type="text" 
+                            name= "landlordName" 
+                            value = {form.landlordName} 
+                            placeholder= "Landlord Name"
+                            onChange = {handleChange} 
+                        />
+                    </div>
+                    <div className="inpDiv">
+                        <input 
+                            type="number" 
+                            name="landlordPhone"
+                            value = {form.landlordPhone} 
+                            placeholder= "Landlord Phone"
+                            onChange={handleChange}
+                        />
                     </div>
                     <Error error={error} /> 
                     <Success success={success}/>

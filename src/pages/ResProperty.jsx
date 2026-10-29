@@ -9,11 +9,10 @@ import { useNavigate } from "react-router-dom";
 const PropertySharing = ({ property }) => {
     // Use the current website URL and property ID
     const listingUrl =
-        `${window.location.origin}/property/${property.id}`;
+        `${window.location.origin}/property/${property.pid}`;
 
     const shareMessage =
-        `${property.name}\n` +
-        `Location: ${property.location}\n` +
+        `${property.title}\n` +
         `Monthly rental: R${property.monthly_rental || "N/A"}\n` +
         `View property: ${listingUrl}`;
 
@@ -84,6 +83,7 @@ const ResProperty = () => {
     const [error, setError] = useState (null);
     const [isOpen, setIsOpen] = useState (true);
     const [showModal, setShowModal] = useState (false)
+    const [status, setStatus] = useState (null);
     const navigate = useNavigate();
     useEffect (() => {
 
@@ -106,6 +106,17 @@ const ResProperty = () => {
         getProperty ();
     }, [pid])
 
+    const updatePropertyHandler = async () =>{
+        if (property.availability !== status) {
+            const res = await api (`/property/updateStatus`, 'POST', {pid, status})
+            if (res.error) {
+                alert(res.error)
+            } else {
+                alert(res.success)
+            }
+        }
+    }
+
     const openConfirm = () => setShowModal (true)
     const handleCancel = () => setShowModal(false);
     
@@ -125,19 +136,41 @@ const ResProperty = () => {
                         </div>
                         <h2>{property.title || ''}</h2>
                         <div className="profileDatail">
-                            <span><b>Location</b>:</span>
-                            <span>{property.location}</span>
-                        </div>
-
-                        <div className="profileDatail">
                             <span><b>Agent</b>:</span>
                             <span>{property.user.name} {property.user.surname}</span>
                         </div>
 
-                        <div className="profileDatail">
-                            <span><b>Availability</b>:</span>
-                            <span>{property.availability}</span>
-                        </div>
+                        {auth && auth.uid === property.uid ?
+                            <>
+                                <div className="profileDatail">
+                                    <span><b>Location</b>:</span>
+                                    <span>{property.location}</span>
+                                </div>
+                                <div className="profileDatail">
+                                    <span><b>Landlord</b>:</span>
+                                    <span>{property.landlord_name}</span>
+                                </div>
+                                <div className="profileDatail">
+                                    <span><b>Landlord Phone</b>:</span>
+                                    <span>{property.landlord_phone}</span>
+                                </div>
+                                <div className="profileDatail">
+                                    <span>Availability Status</span>
+                                    <select name="" id="" onChange={e => {setStatus(e.target.value)}}>
+                                        <option value={property.availability}>{property.availability}</option>
+                                        <option value="Available">Available</option>
+                                        <option value="Reserved">Reserved</option>
+                                        <option value="Rented">Rented</option>
+                                        <option value="Unavailable">Unavailable</option>
+                                    </select>
+                                </div>
+                            </>
+                        :
+                            <div className="profileDatail">
+                                <span><b>Availability</b>:</span>
+                                <span>{property.availability}</span>
+                            </div>
+                        }
 
                         <div className="profileDatail">
                             <span><b>Condition</b>:</span>
@@ -146,7 +179,7 @@ const ResProperty = () => {
 
                         <div className="profileDatail">
                             <span><b>Monthly Rental</b>:</span>
-                            <span>{property.monthly_rental || "N/A"}</span>
+                            <span>{`R${property.monthly_rental}` || "N/A"}</span>
                         </div>
 
                         <div className="profileDatail">
@@ -168,6 +201,9 @@ const ResProperty = () => {
                             <span><b>Water</b>:</span>
                             <span>{property.water || "N/A"}</span>
                         </div>
+                        {auth && auth.uid === property.uid ?
+                            <button onClick={updatePropertyHandler}>Update</button>
+                        :<Link to={`/enquire/${property.pid}`}>Enquire</Link>}
                         <PropertySharing property={property} />
                     </div>
                 </>

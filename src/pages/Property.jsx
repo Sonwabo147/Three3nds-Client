@@ -9,11 +9,10 @@ import { useNavigate } from "react-router-dom";
 const PropertySharing = ({ property }) => {
     // Use the current website URL and property ID
     const listingUrl =
-        `${window.location.origin}/property/${property.id}`;
+        `${window.location.origin}/property/${property.pid}`;
 
     const shareMessage =
         `${property.name}\n` +
-        `Location: ${property.location}\n` +
         `Monthly rental: R${property.monthly_rental || "N/A"}\n` +
         `View property: ${listingUrl}`;
 
